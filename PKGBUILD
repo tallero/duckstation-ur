@@ -19,55 +19,52 @@ _pkgdesc=(
 )
 pkgrel=1
 arch=(
-  x86_64
-  aarch64
-  i686
-  pentium4
-  arm
-  risv32
-  powerpc
-  armv7h
+  'x86_64'
+  'aarch64'
+  'i686'
+  'pentium4'
+  'arm'
+  'risv32'
+  'powerpc'
+  'armv7h'
 )
 _gh="github.com"
 _http="https://${_gh}"
 _ns="stenzek"
 url="${_http}/${_ns}/${pkgname}"
 license=(
-  GPL3
+  'GPL3'
 )
 makedepends=(
-  alsa-lib
-  cmake
-  extra-cmake-modules
-  gtk3
-  libdrm
-  libpulse
-  ninja
-  qt6-tools
-  sndio
+  'alsa-lib'
+  'cmake'
+  'extra-cmake-modules'
+  'gtk3'
+  'libdrm'
+  'libpulse'
+  'ninja'
+  'qt6-tools'
+  'sndio'
 )
-source=()
-sha256sums=()
-[[  "${_git}" == "true" ]] && \
+if [[  "${_git}" == "true" ]]; then
   makedepends+=(
-    git
-  ) && \
-  source+=(
-    "${pkgname}-${_pkgver}::git+${url}#commit=${_commit}"
-  ) && \
-  sha256sums+=(
-    SKIP
+    'git'
   )
-[[ "${_git}" == false ]] && \
-  source+=(
-    "${pkgname}-${_pkgver}.tar.gz::${url}/archive/refs/tags/v${_pkgver}.tar.gz"
-  ) && \
-  sha256sums+=(
-    "c061a7a65575242652cf2224a830b14881274f1569393f84af41de6304874fe2"
-  )
+  _src="${pkgname}-${_pkgver}::git+${url}#commit=${_commit}"
+  _sum="SKIP"
+elif [[ "${_git}" == false ]]; then
+  _src="${pkgname}-${_pkgver}.tar.gz::${url}/archive/refs/tags/v${_pkgver}.tar.gz"
+  _sum="c061a7a65575242652cf2224a830b14881274f1569393f84af41de6304874fe2"
+fi
+source=(
+  "${_src}"
+)
+sha256sums=(
+  "${_sum}"
+)
 depends=(
-  sdl2
-  qt6-base
+  'sdl2'
+  'qt6-base'
 )
 optdepends=(
   'psx-bios: PlayStation Bioses'
@@ -77,11 +74,14 @@ build() {
   local \
     _cmake_opts=()
   _cmake_opts=(
-    -B build
-    -S "${pkgname}-${_pkgver}"
+    -B
+      build
+    -S
+      "${pkgname}-${_pkgver}"
     -DBUILD_NOGUI_FRONTEND=ON
     -DUSE_WAYLAND=ON
-    -G Ninja
+    -G
+      Ninja
     -Wno-dev
   )
   cmake \
@@ -101,7 +101,7 @@ package() {
     -d "${_pkgdir}/opt"
   cp \
     -rv \
-    build/bin \
+    "build/bin" \
     "${_pkgdir}/opt/${pkgname}"
 
   # Symlink to /usr/bin
