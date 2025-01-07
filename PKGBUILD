@@ -41,7 +41,7 @@ sha256sums=(
 
 build() {
     cmake -B build -S "${_pkgname}-${_pkgver}" \
-        -DBUILD_NOGUI_FRONTEND=OFF \
+        -DBUILD_NOGUI_FRONTEND=ON \
         -DUSE_WAYLAND=ON \
         -G Ninja \
         -Wno-dev
