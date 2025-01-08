@@ -1,3 +1,7 @@
+# SPDX-License-Identifier: AGPL-3.0
+#
+# Maintainer: Truocolo <truocolo@aol.com>
+# Maintainer: Pellegrino Prevete (tallero) <pellegrinoprevete@gmail.com>
 # Maintainer: Pellegrino Prevete <pellegrinoprevete@gmail.com>
 # Contributor: katt <magunasu.b97@gmail.com>
 
@@ -5,30 +9,43 @@ _pkgname=duckstation
 pkgname="${_pkgname}"
 pkgver=2023.06.08
 _pkgver="latest"
-pkgdesc='A Sony PlayStation (PSX) emulator, focusing on playability, speed, and long-term maintainability (git version)'
+pkgdesc=(
+  "A Sony PlayStation (PSX) emulator,"
+  "focusing on playability, speed,"
+  "and long-term maintainability"
+pkgdesc="${_pkgdesc[*]}"
 pkgrel=1
 arch=(
-  x86_64
-  aarch64
-  i686
-  pentium4
+  "x86_64"
+  "aarch64"
+  "i686"
+  "pentium4"
 )
-url="https://github.com/stenzek/${_pkgname}"
-license=(GPL3)
+_http="https://github.com"
+_ns="stenzek"
+url="${_http}/${_ns}/${_pkgname}"
+license=(
+  "GPL3"
+)
 makedepends=(
-  cmake
-  extra-cmake-modules
-  git
-  qt6-tools
-  libdrm
-  libpulse
-  alsa-lib
-  sndio
-  gtk3
-  ninja
+  "cmake"
+  "extra-cmake-modules"
+  "git"
+  "qt6-tools"
+  "libdrm"
+  "libpulse"
+  "alsa-lib"
+  "sndio"
+  "gtk3"
+  "ninja"
 )
-depends=(sdl2 qt6-base)
-optdepends=('psx-bios: PlayStation Bioses')
+depends=(
+  "sdl2"
+  "qt6-base"
+)
+optdepends=(
+  'psx-bios: PlayStation Bioses'
+)
 _commit="2d78b3f26a18600cbeb1f7add97f345d7345deeb"
 source=(
   "${_pkgname}-${_pkgver}::git+${url}#commit=${_commit}"
@@ -40,25 +57,41 @@ sha256sums=(
 )
 
 build() {
-    cmake -B build -S "${_pkgname}-${_pkgver}" \
-        -DBUILD_NOGUI_FRONTEND=ON \
-        -DUSE_WAYLAND=ON \
-        -G Ninja \
-        -Wno-dev
-    ninja -C build
+  cmake \
+    -B \
+      build \
+    -S \
+      "${_pkgname}-${_pkgver}" \
+    -DBUILD_NOGUI_FRONTEND=ON \
+    -DUSE_WAYLAND=ON \
+    -G \
+      Ninja \
+    -Wno-dev
+  ninja \
+    -C \
+      build
 }
 
 package() {
-    # Main files
-    install -m755 -d "${pkgdir}/opt"
-    cp -rv build/bin "${pkgdir}/opt/${_pkgname}"
-
-    # Symlink to /usr/bin
-    install -m755 -d "${pkgdir}/usr/bin"
-    ln -svt "${pkgdir}/usr/bin" "/opt/${_pkgname}/${_pkgname}"-{qt,nogui}
-
-    # Desktop file
-    cat > "${_pkgname}-${_pkgver}/data/resources/${_pkgname}.desktop" << EOF
+  # Main files
+  install \
+    -dm755 \
+    "${pkgdir}/opt"
+  cp \
+    -rv \
+    "build/bin" \
+    "${pkgdir}/opt/${_pkgname}"
+  # Symlink to /usr/bin
+  install \
+    -dm755 \
+    "${pkgdir}/usr/bin"
+  ln \
+    -svt \
+    "${pkgdir}/usr/bin" \
+    "/opt/${_pkgname}/${_pkgname}"-{"qt","nogui"}
+  # Desktop file
+  cat > \
+    "${_pkgname}-${_pkgver}/data/resources/${_pkgname}.desktop" << EOF
 [Desktop Entry]
 Type=Application
 Name=DuckStation
@@ -69,6 +102,12 @@ TryExec=duckstation-qt
 Exec=duckstation-qt %f
 Categories=Game;Emulator;Qt;
 EOF
-    install -Dm644 "${_pkgname}-${_pkgver}/data/resources/${_pkgname}.desktop" "${pkgdir}/usr/share/applications/${_pkgname}-qt.desktop"
-    install -Dm644 "${_pkgname}-${_pkgver}/data/resources/images/duck.png" "${pkgdir}/usr/share/pixmaps/${_pkgname}.png"
+  install \
+    -Dm644 \
+    "${_pkgname}-${_pkgver}/data/resources/${_pkgname}.desktop" \
+    "${pkgdir}/usr/share/applications/${_pkgname}-qt.desktop"
+  install \
+    -Dm644 \
+    "${_pkgname}-${_pkgver}/data/resources/images/duck.png" \
+    "${pkgdir}/usr/share/pixmaps/${_pkgname}.png"
 }
