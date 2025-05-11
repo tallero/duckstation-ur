@@ -61,15 +61,19 @@ arch=(
   "pentium4"
 )
 _http="https://github.com"
-_ns="stenzek"
+# _ns="stenzek"
+_ns="themartiancompany"
 url="${_http}/${_ns}/${_pkg}"
 license=(
   "GPL3"
 )
+depends=(
+  "sdl2"
+  "qt6-base"
+)
 makedepends=(
   "cmake"
   "extra-cmake-modules"
-  "git"
   "qt6-tools"
   "libdrm"
   "libpulse"
@@ -78,10 +82,11 @@ makedepends=(
   "gtk3"
   "ninja"
 )
-depends=(
-  "sdl2"
-  "qt6-base"
-)
+if [[ "${_git}" == "true" ]]; then
+  makedepends+=(
+    "git"
+  )
+fi
 _psx_bios_optdepends=(
   "psx-bios:"
     "Sony PlayStation bioses."
@@ -93,15 +98,16 @@ _tarname="${_pkg}-${_pkgver}"
 if [[ "${_git}" == "true" ]]; then
   _src="${_tarname}::git+${url}#commit=${_commit}"
   _sum="SKIP"
+elif [[ "${_git}" == "false" ]]; then
+  _uri="${url}/archive/refs/tags/${_pkgver}.tar.gz"
+  _src="${_tarname}.tar.xz::${_uri}"
+  _sum='adc6af10f1a14059ebb00637dac7283760f6ef647ebaec224a0e6e88ac901f0a'
 fi
 source=(
   "${_src}"
-  # "${_pkgname}-${_pkgver}::git+${url}#commit=${_commit}"
-  # "${url}/archive/refs/tags/${_pkgver}.tar.gz"
 )
 sha256sums=(
   "${_sum}"
-  #'adc6af10f1a14059ebb00637dac7283760f6ef647ebaec224a0e6e88ac901f0a'
 )
 
 build() {
