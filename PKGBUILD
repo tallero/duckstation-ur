@@ -25,6 +25,19 @@
 # Maintainer: Pellegrino Prevete (dvorak) <dvorak@0x87003Bd6C074C713783df04f36517451fF34CBEf>
 # Contributor: katt <magunasu.b97@gmail.com>
 
+_evmfs_available="$( \
+  command \
+    -v \
+    "evmfs" || \
+    true)"
+if [[ ! -v "_evmfs" ]]; then
+  if [[ "${_evmfs_available}" != "" ]]; then
+    _evmfs="true"
+  elif [[ "${_evmfs_available}" == "" ]]; then
+    _evmfs="false"
+  fi
+fi
+
 if [[ ! -v "_git" ]]; then
   _git="true"
 fi
@@ -69,8 +82,12 @@ depends=(
   "sdl2"
   "qt6-base"
 )
+_psx_bios_optdepends=(
+  "psx-bios:"
+    "Sony PlayStation bioses."
+)
 optdepends=(
-  'psx-bios: PlayStation Bioses'
+  "${_psx_bios_optdepends[*]}"
 )
 _tarname="${_pkg}-${_pkgver}"
 if [[ "${_git}" == "true" ]]; then
