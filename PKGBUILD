@@ -1,19 +1,45 @@
 # SPDX-License-Identifier: AGPL-3.0
+
+#    ----------------------------------------------------------------------
+#    Copyright © 2022, 2023, 2024, 2025  Pellegrino Prevete
 #
+#    All rights reserved
+#    ----------------------------------------------------------------------
+#
+#    This program is free software: you can redistribute it and/or modify
+#    it under the terms of the GNU Affero General Public License as published by
+#    the Free Software Foundation, either version 3 of the License, or
+#    (at your option) any later version.
+#
+#    This program is distributed in the hope that it will be useful,
+#    but WITHOUT ANY WARRANTY; without even the implied warranty of
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#    GNU Affero General Public License for more details.
+#
+#    You should have received a copy of the GNU Affero General Public License
+#    along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
 # Maintainer: Truocolo <truocolo@aol.com>
-# Maintainer: Pellegrino Prevete (tallero) <pellegrinoprevete@gmail.com>
-# Maintainer: Pellegrino Prevete <pellegrinoprevete@gmail.com>
+# Maintainer: Truocolo <truocolo@0x6E5163fC4BFc1511Dbe06bB605cc14a3e462332b>
+# Maintainer: Pellegrino Prevete (dvorak) <pellegrinoprevete@gmail.com>
+# Maintainer: Pellegrino Prevete (dvorak) <dvorak@0x87003Bd6C074C713783df04f36517451fF34CBEf>
 # Contributor: katt <magunasu.b97@gmail.com>
 
-_pkgname=duckstation
-pkgname="${_pkgname}"
+if [[ ! -v "_git" ]]; then
+  _git="true"
+fi
+_pkg=duckstation
+_pkgname="${_pkg}"
+pkgname="${_pkg}"
 pkgver=2023.06.08
 _pkgver="latest"
 pkgdesc=(
   "A Sony PlayStation (PSX) emulator,"
   "focusing on playability, speed,"
   "and long-term maintainability"
+)
 pkgdesc="${_pkgdesc[*]}"
+_commit="2d78b3f26a18600cbeb1f7add97f345d7345deeb"
 pkgrel=1
 arch=(
   "x86_64"
@@ -23,7 +49,7 @@ arch=(
 )
 _http="https://github.com"
 _ns="stenzek"
-url="${_http}/${_ns}/${_pkgname}"
+url="${_http}/${_ns}/${_pkg}"
 license=(
   "GPL3"
 )
@@ -46,27 +72,37 @@ depends=(
 optdepends=(
   'psx-bios: PlayStation Bioses'
 )
-_commit="2d78b3f26a18600cbeb1f7add97f345d7345deeb"
+_tarname="${_pkg}-${_pkgver}"
+if [[ "${_git}" == "true" ]]; then
+  _src="${_tarname}::git+${url}#commit=${_commit}"
+  _sum="SKIP"
+fi
 source=(
-  "${_pkgname}-${_pkgver}::git+${url}#commit=${_commit}"
+  "${_src}"
+  # "${_pkgname}-${_pkgver}::git+${url}#commit=${_commit}"
   # "${url}/archive/refs/tags/${_pkgver}.tar.gz"
 )
 sha256sums=(
-  'SKIP'
+  "${_sum}"
   #'adc6af10f1a14059ebb00637dac7283760f6ef647ebaec224a0e6e88ac901f0a'
 )
 
 build() {
-  cmake \
-    -B \
-      build \
+  local \
+    _cmake_opts=()
+  _cmake_opts+=(
+    -B
+      "build"
     -S \
-      "${_pkgname}-${_pkgver}" \
-    -DBUILD_NOGUI_FRONTEND=ON \
-    -DUSE_WAYLAND=ON \
-    -G \
-      Ninja \
+      "${_tarname}"
+    -DBUILD_NOGUI_FRONTEND="ON"
+    -DUSE_WAYLAND="ON"
+    -G
+      Ninja
     -Wno-dev
+  )
+  cmake \
+    "${_cmake_opts[@]}"
   ninja \
     -C \
       build
@@ -80,7 +116,7 @@ package() {
   cp \
     -rv \
     "build/bin" \
-    "${pkgdir}/opt/${_pkgname}"
+    "${pkgdir}/opt/${_pkg}"
   # Symlink to /usr/bin
   install \
     -dm755 \
@@ -88,10 +124,10 @@ package() {
   ln \
     -svt \
     "${pkgdir}/usr/bin" \
-    "/opt/${_pkgname}/${_pkgname}"-{"qt","nogui"}
+    "/opt/${_pkg}/${_pkg}"-{"qt","nogui"}
   # Desktop file
   cat > \
-    "${_pkgname}-${_pkgver}/data/resources/${_pkgname}.desktop" << EOF
+    "${_tarname}/data/resources/${_pkg}.desktop" << EOF
 [Desktop Entry]
 Type=Application
 Name=DuckStation
@@ -104,10 +140,10 @@ Categories=Game;Emulator;Qt;
 EOF
   install \
     -Dm644 \
-    "${_pkgname}-${_pkgver}/data/resources/${_pkgname}.desktop" \
-    "${pkgdir}/usr/share/applications/${_pkgname}-qt.desktop"
+    "${_tarname}/data/resources/${_pkg}.desktop" \
+    "${pkgdir}/usr/share/applications/${_pkg}-qt.desktop"
   install \
     -Dm644 \
-    "${_pkgname}-${_pkgver}/data/resources/images/duck.png" \
-    "${pkgdir}/usr/share/pixmaps/${_pkgname}.png"
+    "${_tarname}/data/resources/images/duck.png" \
+    "${pkgdir}/usr/share/pixmaps/${_pkg}.png"
 }
